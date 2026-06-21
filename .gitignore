@@ -1,0 +1,21 @@
+# cloudflared
+cloudflared
+*.log
+
+# Tunnel credentials / config (never commit)
+*.json
+tunnel.env
+cert.pem
+.cloudflared/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

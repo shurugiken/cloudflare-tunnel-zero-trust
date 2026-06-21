@@ -1,0 +1,44 @@
+[Unit]
+Description=cloudflared tunnel for local service on 127.0.0.1:8080
+Documentation=https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# --- Quick tunnel (default) ------------------------------------------------
+# Ephemeral *.trycloudflare.com hostname, no account or token required.
+# Read the generated URL with: journalctl -u service-tunnel.service -f
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8080
+
+# --- Named tunnel (production) ---------------------------------------------
+# Stable hostname under your own domain, plus Cloudflare Access support.
+# Create the tunnel in the Zero Trust dashboard, then either pass the token
+# inline (comment out the ExecStart above and uncomment this):
+#
+# ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate run --token <TUNNEL_TOKEN>
+#
+# ...or, better, keep the token out of the unit file in a root-only env file:
+#
+# EnvironmentFile=/etc/cloudflared/tunnel.env
+# ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate run
+
+Restart=on-failure
+RestartSec=5
+Type=simple
+
+# --- Hardening (recommended for production) --------------------------------
+# Uncomment to shrink the service's privileges and filesystem view.
+# Verify the result with: systemd-analyze security service-tunnel.service
+#
+# NoNewPrivileges=true
+# ProtectSystem=strict
+# ProtectHome=true
+# PrivateTmp=true
+# DynamicUser=true
+# RestrictAddressFamilies=AF_INET AF_INET6
+# RestrictNamespaces=true
+# LockPersonality=true
+# MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
